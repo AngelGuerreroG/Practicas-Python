@@ -10,7 +10,7 @@ def cambio(coord, largo):
 
 n = 50
 dur = 30
-k = 4
+k = 3
 pos = [randint(0, n) for part in range(k)]
 simb = '#*Xo'
 nada = '-'
