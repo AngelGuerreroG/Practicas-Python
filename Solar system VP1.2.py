@@ -1,11 +1,11 @@
 #VISUAL DEFINE
 
-from visual import* #allows the program to run and create visual actions 
-from visual.graph import* #allows the program to create graphs based on the code
+from visual import * #allows the program to run and create visual actions 
+from visual.graph import * #allows the program to create graphs based on the code
 from random import random
 
 scene = display (title = 'Sistema solar', width = 800, height = 800, \
-                 range = (25000,25000,25000), center = (1000,0,0)) #sets up the window to view the program 
+                 range = (25000,25000,25000), center = (0,0,0)) #sets up the window to view the program 
 scene.autoscale = True #commands the scene to scale on its own when necessary
 
 
@@ -34,7 +34,7 @@ col = {"sun": color.yellow, "mercury": color.cyan, "venus": color.orange, "earth
        "mars": color.red, "jupiter": color.cyan,"saturn": color.blue, \
        "uranus": color.magenta,"neptune": color.red, "pluto": color.white}
 
-vel = {"mercury": vector(0,0,295), "venus": vector(0,0,225), "earth": vector(0,0,195), "moon": vector(0,0,195+1),\
+vel = {"mercury": vector(0,0,295), "venus": vector(0,0,225), "earth": vector(0,0,195), "moon": vector(0,0,195),\
        "mars": vector(0,0,155), "jupiter": vector(0,0,70),"saturn": vector(0,0,50), "uranus": vector(0,0,30),\
        "neptune": vector(0,0,23), "pluto": vector(0,0,15)}
 
@@ -45,7 +45,6 @@ for l in labels:
     c = col[l]
     o = sphere(pos = position[l], radius = sr * radii[l], material = mat[l], color = c) #DEFINING PLANETS AS SPHERES
     o.trail = curve(color = c)
-    o.graphic = gcurve(color = c)
     if l in vel:
         o.velocity = vel[l]
     obj[l] = o
@@ -84,22 +83,33 @@ ratio = {"sun": 0, "mercury": 1.600, "venus": 1.177 , "earth": 1.000, "moon": 1.
          "saturn": 0.324, "uranus": 0.228,"neptune": 0.182, "pluto": 0.158}
 
 t = 0 #initial time is 0 seconds
-deltat = .01 #defines deltat change in time the calculations are made every .005 "seconds", as this is the defined change in time
-time_interval = 0.5 #creates the time interval for plotting on the graphs
-time_interval_int = int(time_interval/deltat) #adjusts the time interval based on the defined deltat
+deltat = .02 #defines deltat change in time the calculations are made every .005 "seconds", as this is the defined change in time
+#time_interval = 0.5 #creates the time interval for plotting on the graphs
+#time_interval_int = int(time_interval/deltat) #adjusts the time interval based on the defined deltat
 
 #---------------------------------------------------------------------------------------------------------------------
 #CREATING THE "while" LOOP
 
-while True: #program will run while t is less than 3000 seconds
+t = 0
+dt = 1000
+c = 500
+logfile = open("velocidades.txt", "w")
+logfile2 = open ("posiciones.txt","w")
+while c > 0: #program will run while t is less than 3000 seconds
     rate (10000) #controls the speed of the program so it only goes through the loop 1000 times per second
 
     #-----------------------------------------------------------------------------------------------------------------
     #CREATING THE MOTION LOOP
 
+    if t % dt == 0:
+        c -= 1
     for l in labels:
+
         if l == "sun":
             continue
+        if t % dt == 0:
+            print >>logfile, "%d, %s, %f" % (t, l, mag(o.velocity))
+            print >>logfile2, "%d, %s, %s" % (t, l,(o.pos))
         o = obj[l]
         o.trail.append(pos = o.pos) 
         d = mag(o.pos)
@@ -111,7 +121,9 @@ while True: #program will run while t is less than 3000 seconds
         o.pos += o.velocity * deltat 
         o.rotate(angle = radians(rotation[l]), axis=(0,1,0)) 
         ratio[l] = mag(o.velocity) / mag(obj["earth"].velocity) 
-        o.graphic.plot((t,o.pos)) 
-
+       
+    t += 1
+            
+logfile.close()
 
 
